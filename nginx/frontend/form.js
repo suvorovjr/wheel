@@ -5,7 +5,7 @@ document.querySelector("#callback-form").addEventListener("submit", async functi
     const data = Object.fromEntries(formData.entries());
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/api/v1/send-message/", {
+        const response = await fetch("http://localhost/api/v1/send-message/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

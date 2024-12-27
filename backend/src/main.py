@@ -19,18 +19,17 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(
     title="Randomaizer",
+    docs_url="/api/openapi",
+    openapi_url="/api/openapi.json",
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
 )
 
-origins = [
-    "http://127.0.0.1:5500",
-    "http://localhost:5500",
-]
+origins = ["http://127.0.0.1:5500", "http://localhost:5500", "http://nginx"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

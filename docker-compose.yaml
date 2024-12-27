@@ -1,0 +1,26 @@
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - project_network
+
+  backend:
+    build: ./backend
+    container_name: backend
+    env_file:
+      - backend/.env
+    networks:
+      - project_network
+
+
+networks:
+  project_network:
+    driver: bridge
