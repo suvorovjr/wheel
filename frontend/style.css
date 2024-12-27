@@ -1,0 +1,326 @@
+/* делаем везде так, чтобы свойства width и height задавали не размеры контента, а размеры блока */
+* {
+  box-sizing: border-box;
+}
+
+/* общие настройки страницы */
+body {
+  /* подключаем сетку */
+  display: grid;
+  /* ставим всё по центру */
+  place-items: center;
+  /* если что-то не помещается на своё место — скрываем то, что не поместилось */
+  overflow: hidden;
+  background: url('./img/bg1.jpg') no-repeat;
+  min-height:100vh;
+  background-size:cover;
+}
+
+/* общий блок для всех элементов */
+.deal-wheel {
+  /* задаём переменные блока */
+  /* размеры колеса */
+  --size: clamp(450px, 80vmin, 700px);
+  /* настройки яркости и заливки фона секторов */
+  --lg-hs: 0 3%;
+  --lg-stop: 50%;
+  --lg: linear-gradient(
+      hsl(var(--lg-hs) 0%) 0 var(--lg-stop),
+      hsl(var(--lg-hs) 20%) var(--lg-stop) 100%
+    );
+  /* добавляем позиционирование относительно других элементов */
+  position: relative;
+  /* подключаем сетку */
+  display: grid;
+  grid-gap: calc(var(--size) / 20);
+  /* выравниваем содержимое блока по центру */
+  align-items: center;
+  /* задаём имена областей внутри сетки */
+  grid-template-areas:
+    "spinner"
+    "trigger";
+  /* устанавливаем размер шрифта */
+  font-size: calc(var(--size) / 40);
+  position:relative;
+}
+.deal-wheel::before {
+	content:'';
+	background: url('./img/logo.png') no-repeat #fff;
+	width:75px;
+	height:75px;
+	position:absolute;
+	top:50%;
+	margin: -85px 0 0 -35px;
+	left:50%;
+	z-index: 2;
+	border-radius: 100%;
+}
+span.text {
+	
+}
+/* всё, что относится ко внутренним элементам главного блока, будет находиться в области сетки с названием spinner */
+.deal-wheel > * {
+  grid-area: spinner;
+}
+
+/* сам блок и кнопка будут находиться в области сетки с названием trigger и будут выровнены по центру */
+.deal-wheel .btn-spin {
+  grid-area: trigger;
+  justify-self: center;
+}
+
+/* сектор колеса */
+.spinner {
+  /* добавляем относительное позиционирование */
+  position: relative;
+  /* подключаем сетку */
+  display: grid;
+  /* выравниваем всё по центру */
+  align-items: center;
+  /* добавляем элемент в сетку */
+  grid-template-areas: "spinner";
+  /* устанавливаем размеры */
+  width: var(--size);
+  height: var(--size);
+  /* поворачиваем элемент  */
+  transform: rotate(calc(var(--rotate, 25) * 1deg));
+  /* рисуем круглую обводку, а всё, что не поместится, — будет скрыто за кругом */
+  border-radius: 50%;
+  padding:0;
+}
+
+/* всё, что внутри этого блока, будет находиться в области сетки с названием spinner */
+.spinner * {
+  grid-area: spinner;
+}
+
+/* текст на секторах */
+.prize {
+  /* включаем «гибкую» вёрстку */
+  display: flex;
+  align-items: center;
+  /* задаём отступы от краёв блока */
+  padding: 0 calc(var(--size) / 6) 0 calc(var(--size) / 30);
+  /* устанавливаем размеры */
+  width: 50%;
+  height: 50%;
+  /* устанавливаем координаты, относительно которых будем вращать текст */
+  transform-origin: center right;
+  /* поворачиваем текст */
+  transform: rotate(var(--rotate));
+  /* запрещаем пользователю выделять мышкой текст на секторах */
+  user-select: none;
+}
+
+/* язычок */
+.ticker {
+  /* добавляем относительное позиционирование */
+  position: relative;
+  /* устанавливаем размеры */
+  left: calc(var(--size) / -15);
+  width: calc(var(--size) / 10);
+  height: calc(var(--size) / 20);
+  /* фон язычка */
+  background: var(--lg);
+  /* делаем так, чтобы язычок был выше колеса */
+  z-index: 1;
+  /* форма язычка */
+  clip-path: polygon(20% 0, 100% 50%, 20% 100%, 0% 50%);
+  /* устанавливаем точку, относительно которой будет вращаться язычок при движении колеса */
+  transform-origin: center left;
+}
+
+/* кнопка запуска колеса */
+.btn-spin {
+  color: white;
+  background: black;
+  border: none;
+  /* берём размер шрифта такой же, как в колесе */
+  font-size: inherit;
+  /* добавляем отступы от текста внутри кнопки */
+  padding: 0.9rem 2rem 1rem;
+  /* скругляем углы */
+  border-radius: 0.5rem;
+  /* меняем внешний вид курсора над кнопкой на руку*/
+  cursor: pointer;
+}
+
+/* если кнопка нажата и неактивна */
+.btn-spin:disabled {
+  /* меняем внешний вид курсора */
+  cursor: progress;
+  /* делаем кнопку полупрозрачной */
+  opacity: 0.25;
+}
+
+/* анимация вращения */
+.is-spinning .spinner {
+  transition: transform 8s cubic-bezier(0.1, -0.01, 0, 1);
+}
+
+/* анимация движения язычка */
+.is-spinning .ticker {
+          animation: tick 700ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+
+/* эффект, когда колесо задевает язычок при вращении */
+@keyframes tick {
+  40% {
+    /* чуть поворачиваем язычок наверх в середине анимации */
+    transform: rotate(-12deg);
+  }
+}
+
+/* анимируем выпавший сектор */
+.prize.selected .text {
+  /* делаем текст белым */
+  color: white;
+  /* настраиваем длительность анимации */
+  animation: selected 800ms ease;
+}
+
+/* настраиваем анимацию текста на выпавшем секторе по кадрам */
+@keyframes selected {
+  /* что происходит на 25% от начала анимации */
+  25% {
+    /* увеличиваем текст в 1,25 раза */
+    transform: scale(1.25);
+    /* добавляем тексту тень */
+    text-shadow: 1vmin 1vmin 0 hsla(0 0% 0% / 0.1);
+  }
+  40% {
+    transform: scale(0.92);
+    text-shadow: 0 0 0 hsla(0 0% 0% / 0.2);
+  }
+  60% {
+    transform: scale(1.02);
+    text-shadow: 0.5vmin 0.5vmin 0 hsla(0 0% 0% / 0.1);
+  }
+  75% {
+    transform: scale(0.98);
+  }
+  85% {
+    transform: scale(1);
+  }
+}
+
+.snowflakes-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+.modal-header {
+    border-radius: 20px 20px 0px 0px;
+    background: var(---, #252526);
+    box-shadow: 2px 2px 10px 0px #A7AEE8 inset;
+    padding: 20px;
+}
+
+.modal-content {
+    background: transparent;
+    border: 0;
+	top: 10vh;
+}
+
+.modal-body {
+    background: #fff;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+	padding:20px;
+}
+.modal-body .b24-form-control-container {
+	display:flex;
+}
+.modal-body input[type=checkbox] {
+    width: 85px;
+    margin: 10px;
+    box-sizing: border-box;
+}
+.modal-body .b24-form-sign {
+	display:none;
+}
+.modal-title {
+    color: #FFF;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 100%;
+}
+
+.btn-close {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="25" viewBox="0 0 28 25" fill="none"><rect width="32" height="4" rx="2" transform="matrix(0.748456 -0.663184 0.652148 0.758091 0 21.344)" fill="url(%23paint0_linear_170_2050)"/><rect width="33" height="4" rx="2" transform="matrix(0.760921 0.648845 -0.637695 0.770289 2.55078 0)" fill="url(%23paint1_linear_170_2050)"/><defs><linearGradient id="paint0_linear_170_2050" x1="0" y1="0" x2="0.984615" y2="7.87692" gradientUnits="userSpaceOnUse"><stop offset="1" stop-color="%23F9FFFF"/><stop stop-color="%23E1EBF1"/></linearGradient><linearGradient id="paint1_linear_170_2050" x1="0" y1="0" x2="0.955656" y2="7.88416" gradientUnits="userSpaceOnUse"><stop offset="1" stop-color="%23F9FFFF"/><stop stop-color="%23E1EBF1"/></linearGradient></defs></svg>');
+}
+
+.modal-body label {
+    color: var(---, #252526);
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%;
+    padding: 20px 0 5px 0;
+    display: block;
+}
+
+.modal-body input {
+    border-radius: 4px;
+    border: 1px solid rgba(37, 37, 38, 0.20);
+    width: 100%;
+    display: block;
+    padding: 12px 10px;
+}
+
+.modal-body input.error {
+    border: 1px solid red;
+}
+
+.modal-body button {
+    border-radius: 10px;
+    background: var(---, #252526);
+    width: 100%;
+    color: #FFF;
+    padding: 15px 0;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 100%;
+    /* 18px */
+    margin-top: 20px;
+}
+
+.modal-body img {
+    display: block;
+    margin: 0 auto;
+}
+.modal-body strong,
+.modal-body p {
+    text-align: left;
+    display: block;
+    line-height: 120%;
+    font-size: 14px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.modal-body p.msg {
+    text-align: left;
+    display: block;
+    line-height: 120%;
+    font-size: 12px;
+    margin: 0 auto;
+    width: 100%;
+	padding:10px 0 0 0;
+}
+.modal-body .thank-text strong, 
+.modal-body .thank-text p {
+	text-align:center;
+}
+.modal-body .thank-text strong {
+	font-size:16px;
+	padding:0 0 15px 0;
+}
+.text {
+	color:#fff;
+}
